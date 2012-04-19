@@ -1,4 +1,4 @@
-// Bukkit Plugin "World" by Siguza and steffengy
+// Bukkit Plugin "iWorld" by Siguza and steffengy
 // This software is distributed under the following license:
 // http://creativecommons.org/licenses/by-nc-sa/3.0/
 
@@ -10,6 +10,7 @@ import net.minecraft.server.*;
 
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.generator.ChunkGenerator;
 
 public class iPlugin extends JavaPlugin
 {
