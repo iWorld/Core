@@ -37,7 +37,7 @@ public class GeneratorBase
         {
             for(z = 0; z < 16; z++)
             {
-                set(blocks, i, 0, j, 7);
+                set(i, 0, j, 7);
             }
         }
         return blocks;
@@ -59,6 +59,6 @@ public class GeneratorBase
         int r2 = rand.nextInt(10) + 3;
         int r3 = rand.nextInt(16);
         int r4 = rand.nextInt(16);
-        return Math.round(Math.cos(Math.pow((x * z) % 3, Math.sin((x * r1) ^ r3) * Math.cos((z * r2) ^ r4)))) * 64) + 64;
+        return (int)Math.round(Math.cos(Math.pow((x * z) % 3, Math.sin((x * r1) ^ r3) * Math.cos((z * r2) ^ r4))) * 64) + 64;
     }
 }

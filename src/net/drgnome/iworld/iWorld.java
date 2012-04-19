@@ -10,7 +10,7 @@ import net.minecraft.server.*;
 
 import org.bukkit.World;
 import org.bukkit.Location;
-import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.generator.*;
 import org.bukkit.block.Biome;
 
 public class iWorld extends ChunkGenerator
@@ -40,7 +40,7 @@ public class iWorld extends ChunkGenerator
         {
             for(int j = 0; j < raw[i].length; j++)
             {
-                blocks[i][j] = Byte.shortValue(raw[i][j]);
+                blocks[i][j] = ((Byte)raw[i][j]).shortValue();
             }
         }
         return blocks;
@@ -48,7 +48,7 @@ public class iWorld extends ChunkGenerator
     
     public byte[][] generateBlockSections(World world, Random rand, int x, int z, BiomeGrid biomes)
     {
-        return GeneratorBase.generate(world, x, z, gen, rand);
+        return GeneratorBase.generate(world, x, z, gen);
     }
     
     public List<BlockPopulator> getDefaultPopulators(World world)
