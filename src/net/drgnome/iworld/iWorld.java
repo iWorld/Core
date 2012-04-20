@@ -29,21 +29,29 @@ public class iWorld extends ChunkGenerator
     
     public Location getFixedSpawnLocation(World world, Random rand)
     {
-        return new Location(world, 0, 64, 0);
+        return new Location(world, 0, 256, 0);
     }
     
     public short[][] generateExtBlockSections(World world, Random rand, int x, int z, BiomeGrid biomes)
     {
-        byte[][] raw = generateBlockSections(world, rand, x, z, biomes);
-        short[][] blocks = new short[16][4096];
-        for(int i = 0; i < raw.length; i++)
+        try
         {
-            for(int j = 0; j < raw[i].length; j++)
+            byte[][] raw = generateBlockSections(world, rand, x, z, biomes);
+            short[][] blocks = new short[16][4096];
+            for(int i = 0; i < raw.length; i++)
             {
-                blocks[i][j] = ((Byte)raw[i][j]).shortValue();
+                for(int j = 0; j < raw[i].length; j++)
+                {
+                    blocks[i][j] = ((Byte)raw[i][j]).shortValue();
+                }
             }
+            return blocks;
         }
-        return blocks;
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return (short[][])null;
+        }
     }
     
     public byte[][] generateBlockSections(World world, Random rand, int x, int z, BiomeGrid biomes)
