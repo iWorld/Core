@@ -22,7 +22,7 @@ public class GeneratorBase
         {
             for(z = 0; z < 16; z++)
             {
-                int max = getBiome(x + i * 16, z + j * 16, world.getSeed());
+                int max = getHeight(x + i * 16, z + j * 16, world.getSeed());
                 max = max > 255 ? 255 : max;
                 for(y = 1; y <= max; y++)
                 {
@@ -52,23 +52,32 @@ public class GeneratorBase
         }
     }
     
-    public static int getBiome(int i, int j, long seed)
+    public static int getHeight(int x, int z, long seed)
     {
         // return (int)Math.round(Math.cos(Math.pow(((x * z) % 3) + 1, Math.abs(Math.sin((x ^ r3) / r1) * Math.cos((z ^ r4) / r2))) / 10) * 96) + 64;
         /*double value = (x * z) % 3;
         value = Math.pow(value, (double)Math.abs(Math.sin((x * r1) ^ r3) * Math.cos((z * r2) ^ r4)));
         value = Math.cos(value / 128) * 96;
         return (int)Math.round(value) + 160;*/
-        return 128 + (int)Math.round(getFactor(i, j, seed) * 32) + (int)Math.round((getFactor((double)i / 1000, (double)j / 1000, seed) - 0.5) * (-64));
+        // return 128 + (int)Math.round(getHeightFactor(i, j, seed) * 32) + (int)Math.round((getHeightFactor((double)i / 1000, (double)j / 1000, seed) - 0.5) * (-64));
+        return 128 + (int)Math.round(getHeightFactor(x, z, seed) * 32);
     }
     
-    public static double getFactor(double i, double j, long seed)
+    public static double getHeightFactor(int x, int z, long seed)
     {
-        double x = i / 100D;
+        /*double x = i / 100D;
         double z = j / 100D;
         Random rand = new Random(seed);
         float r1 = (float)rand.nextInt(100) / 10F;
         float r2 = (float)rand.nextInt(100) / 10F;
-        return Math.cos(Math.pow((x * z) % 3, Math.abs(Math.sin(x * r1) * Math.cos(z * r2))));
+        return Math.cos(Math.pow(Math.abs(x * z) % 3, Math.abs(Math.sin(x * r1) * Math.cos(z * r2))));*/
+        Random rand = new Random(seed);
+        int r1 = rand.nextInt(20) + 90;
+        int r2 = rand.nextInt(20) + 90;
+        double i = (double)x / (double)r1;
+        double j = (double)z / (double)r2;
+        double exp1 = Math.abs(Math.sin(3 * i) * Math.cos(5 * i) * 7);
+        double exp2 = Math.abs(Math.sin(7 * j) * Math.cos(5 * j) * 3);
+        return Math.sin(Math.pow(Math.sin(i) * 3, exp1) + Math.pow(Math.sin(j) * 3, exp2));
     }
 }

@@ -63,17 +63,4 @@ public class iWorld extends ChunkGenerator
     {
         return new ArrayList();
     }
-    
-    /*public static interface BiomeGrid
-    {
-        public Biome getBiome(int x, int z)
-        {
-            
-        }
-        
-        public void setBiome(int x, int x, Biome biome)
-        {
-            
-        }
-    }*/
 }
