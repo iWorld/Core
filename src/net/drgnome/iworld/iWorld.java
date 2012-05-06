@@ -15,11 +15,11 @@ import org.bukkit.block.Biome;
 
 public class iWorld extends ChunkGenerator
 {
-    int gen;
+    String genID;
     
-    public iWorld(int i)
+    public iWorld(String s)
     {
-        gen = i;
+        genID = s;
     }
     
     public boolean canSpawn(World world, int x, int z)
@@ -56,7 +56,7 @@ public class iWorld extends ChunkGenerator
     
     public byte[][] generateBlockSections(World world, Random rand, int x, int z, BiomeGrid biomes)
     {
-        return GeneratorBase.generate(world, x, z, gen);
+        return GeneratorBase.gen(world, x, z, genID, biomes);
     }
     
     public List<BlockPopulator> getDefaultPopulators(World world)

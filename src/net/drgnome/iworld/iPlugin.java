@@ -29,14 +29,6 @@ public class iPlugin extends JavaPlugin
     
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
     {
-        int gen = 0;
-        try
-        {
-            gen = Integer.parseInt(id);
-        }
-        catch(Exception e)
-        {
-        }
-        return new iWorld(gen);
+        return new iWorld(id);
     }
 }
