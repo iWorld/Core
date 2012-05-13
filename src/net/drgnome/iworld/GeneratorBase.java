@@ -44,7 +44,7 @@ public class GeneratorBase
         gen[1] = new SimplexOctaveGenerator(seed, 8);
         gen[1].setScale(1.0/192.0);
         gen[2] = new SimplexOctaveGenerator(seed, 8);
-        gen[2].setScale(1.0/(isSet("2") ? 1024.0 : 128.0));
+        gen[2].setScale(1.0/(isSet("2") ? 1024.0 : 48.0));
         gen[3] = new SimplexOctaveGenerator(seed, 8);
         gen[3].setScale(1.0/384.0);
         gen[4] = new SimplexOctaveGenerator(seed, 8);
@@ -131,15 +131,20 @@ public class GeneratorBase
                     s = 0;
                     switch(field[x][z][y])
                     {
-                        case 1: s = 7; // Bedrock
+                        case 1:
+                            s = 7; // Bedrock
                             break;
-                        case 2: s = 1; // Stone
+                        case 2:
+                            s = 1; // Stone
                             break;
-                        case 3: s = types[0];
+                        case 3:
+                            s = types[0];
                             break;
-                        case 4: s = types[1];
+                        case 4:
+                            s = types[1];
                             break;
-                        case 5: s = types[2];
+                        case 5:
+                            s = types[2];
                             break;
                     }
                     if(s == 0)
@@ -179,7 +184,7 @@ public class GeneratorBase
         byte[][][] cc = genField(chunkX + 1, chunkZ + 1, 0, 8, 0, 8);
         
         double height0 = getLeDurchschnitt(bb, 0, 16, 0, 16);
-        double height = 0;
+        double height = 0D;
         
         height += getValid(height0, getLeDurchschnitt(aa, 8, 16, 8, 16), 32D);
         height += getValid(height0, getLeDurchschnitt(ab, 8, 16, 0, 16), 32D);
@@ -237,6 +242,7 @@ public class GeneratorBase
         // 3: Biome block
         // 4: Second biome block
         // 5: Overlaying block
+        // + Debugging stuff
         int[] levels = new int[4];
         int[] tmp = new int[4];
         double factor;
@@ -254,7 +260,7 @@ public class GeneratorBase
                     field[x][z][y] = 2;
                 }
                 levels[2] = (int)Math.round(gen[2].noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5, 0.5) * (-110)) + 120;
-                factor = isSet("3") ? 1D : (isSet("2") ? 0.1D : (gen[5].noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5, 0.5) / 3.0) + 0.5);
+                factor = isSet("3") ? 1D : (isSet("2") ? 0.3D : (gen[5].noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5, 0.5) / 3.0) + 0.5);
                 levels[2] = (int)Math.round((double)levels[2] * factor);
                 if(isSet("1"))
                 {
@@ -279,7 +285,30 @@ public class GeneratorBase
                     g = true;
                     tmp[0] = levels[0];
                     tmp[1] = levels[1];
-                    for(y = tmp[0]; y <= levels[2]; y++)
+                    while(y <= levels[2])
+                    {
+                        while((gen[3].noise(chunkX * 16 + x, tmp[1] + 1, chunkZ * 16 + z, 0.5, 0.5) >= 0D) && (tmp[1] < levels[2]))
+                        {
+                            tmp[1]++;
+                        }
+                        tmp[2] = (int)Math.floor((double)tmp[1] * 0.8D);
+                        for(tmp[3] = tmp[0]; tmp[3] < tmp[2]; tmp[3]++)
+                        {
+                            field[x][z][tmp[3]] = 3;
+                        }
+                        for(tmp[3] = tmp[2]; tmp[3] < tmp[1]; tmp[3]++)
+                        {
+                            field[x][z][tmp[3]] = 4;
+                        }
+                        field[x][z][tmp[1]] = 5;
+                        tmp[1]++;
+                        while((gen[3].noise(chunkX * 16 + x, tmp[1], chunkZ * 16 + z, 0.5, 0.5) < 0D) && (tmp[1] <= levels[2]))
+                        {
+                            tmp[1]++;
+                        }
+                        y = tmp[0] = tmp[1];
+                    }
+                    /*for(y = tmp[0]; y <= levels[2]; y++)
                     {
                         if(gen[3].noise(chunkX * 16 + x, y, chunkZ * 16 + z, 0.5, 0.5) >= 0D)
                         {
@@ -308,7 +337,7 @@ public class GeneratorBase
                             field[x][z][tmp[1]] = 5;
                             g = false;
                         }
-                    }
+                    }*/
                 }
                 // You shall not pass
                 field[x][z][0] = 1;

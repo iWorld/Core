@@ -161,9 +161,9 @@ public class BiomeHandler
             case ICE_DESERT: return 80; // Snow block
             case DESERT:
             case DESERT_HILLS:
+            case BEACH: return 12; // Sand
             case OCEAN:
             case FROZEN_OCEAN: return blubb.noise(x, z, 0.5, 0.5) >= 0 ? 12 : 3; // Sand or dirt
-            case BEACH: return 12; // Sand
             case SWAMPLAND: return 9; // Water
             default: break;
         }
