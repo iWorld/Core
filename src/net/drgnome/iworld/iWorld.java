@@ -11,15 +11,17 @@ import net.minecraft.server.*;
 import org.bukkit.World;
 import org.bukkit.Location;
 import org.bukkit.generator.*;
-import org.bukkit.block.Biome;
+import org.bukkit.block.*;
 
-public class iWorld extends ChunkGenerator
+public class iWorld extends ChunkGenerator 
 {
-    String genID;
+    private String genID;
+    private long seed;
     
-    public iWorld(String s)
+    public iWorld(World world, String s)
     {
         genID = s;
+        seed = world != null ? world.getSeed() : 0;
     }
     
     public boolean canSpawn(World world, int x, int z)
@@ -27,9 +29,9 @@ public class iWorld extends ChunkGenerator
         return true;
     }
     
-    public Location getFixedSpawnLocation(World world, Random rand)
+    public Location getFixedSpawnLocation(World world, Random random)
     {
-        return new Location(world, 0, 256, 0);
+        return new Location(world, 0, world.getHighestBlockAt(0, 0).getY(), 0);
     }
     
     public short[][] generateExtBlockSections(World world, Random rand, int x, int z, BiomeGrid biomes)
@@ -62,5 +64,10 @@ public class iWorld extends ChunkGenerator
     public List<BlockPopulator> getDefaultPopulators(World world)
     {
         return new ArrayList();
+    }
+    
+    public boolean isSet(String ch)
+    {
+        return genID.contains(ch);
     }
 }

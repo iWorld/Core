@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import net.minecraft.server.*;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.generator.ChunkGenerator;
@@ -29,6 +30,6 @@ public class iPlugin extends JavaPlugin
     
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id)
     {
-        return new iWorld(id);
+        return new iWorld(Bukkit.getWorld(worldName), id);
     }
 }
