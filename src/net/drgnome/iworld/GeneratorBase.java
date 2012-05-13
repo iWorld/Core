@@ -284,7 +284,8 @@ public class GeneratorBase
                 {
                     g = true;
                     tmp[0] = levels[0];
-                    tmp[1] = levels[1];
+                    tmp[1] = y = levels[1];
+                    levels[2] = levels[2] > levels[1] ? levels[2] : levels[1];
                     while(y <= levels[2])
                     {
                         while((gen[3].noise(chunkX * 16 + x, tmp[1] + 1, chunkZ * 16 + z, 0.5, 0.5) >= 0D) && (tmp[1] < levels[2]))
@@ -308,36 +309,6 @@ public class GeneratorBase
                         }
                         y = tmp[0] = tmp[1];
                     }
-                    /*for(y = tmp[0]; y <= levels[2]; y++)
-                    {
-                        if(gen[3].noise(chunkX * 16 + x, y, chunkZ * 16 + z, 0.5, 0.5) >= 0D)
-                        {
-                            if(!g)
-                            {
-                                tmp[0] = y;
-                                g = true;
-                            }
-                            tmp[1] = y;
-                        }
-                        else if(g)
-                        {
-                            if(isSet("0"))
-                            {
-                                tmp[1] += (int)Math.round(gen[4].noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5, 0.5) * (-10));
-                            }
-                            tmp[2] = (int)Math.floor((double)tmp[1] * 0.8D);
-                            for(tmp[3] = tmp[0]; tmp[3] < tmp[2]; tmp[3]++)
-                            {
-                                field[x][z][tmp[3]] = 3;
-                            }
-                            for(tmp[3] = tmp[2]; tmp[3] < tmp[1]; tmp[3]++)
-                            {
-                                field[x][z][tmp[3]] = 4;
-                            }
-                            field[x][z][tmp[1]] = 5;
-                            g = false;
-                        }
-                    }*/
                 }
                 // You shall not pass
                 field[x][z][0] = 1;
