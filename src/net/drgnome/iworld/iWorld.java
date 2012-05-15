@@ -16,6 +16,7 @@ import org.bukkit.block.*;
 public class iWorld extends ChunkGenerator 
 {
     private String genID;
+    // a: Different snow heights
     private long seed;
     
     public iWorld(World world, String s)
@@ -63,7 +64,9 @@ public class iWorld extends ChunkGenerator
     
     public List<BlockPopulator> getDefaultPopulators(World world)
     {
-        return new ArrayList();
+        ArrayList<BlockPopulator> list = new ArrayList<BlockPopulator>();
+        list.add(new BPSnow(genID));
+        return list;
     }
     
     public boolean isSet(String ch)

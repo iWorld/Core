@@ -11,43 +11,62 @@ import org.bukkit.util.noise.SimplexOctaveGenerator;
 
 public class BiomeHandler
 {
-    private SimplexOctaveGenerator temp;
-    private SimplexOctaveGenerator wet;
+    private SimplexOctaveGenerator[] temp;
+    private SimplexOctaveGenerator[] wet;
     private SimplexOctaveGenerator blubb;
     
     public BiomeHandler(long seed, boolean big)
     {
-        temp = new SimplexOctaveGenerator(seed, 8);
-        wet = new SimplexOctaveGenerator(seed, 8);
+        temp = new SimplexOctaveGenerator[2];
+        temp[0] = new SimplexOctaveGenerator(seed, 8);
+        temp[1] = new SimplexOctaveGenerator(seed, 8);
+        wet = new SimplexOctaveGenerator[2];
+        wet[0] = new SimplexOctaveGenerator(seed, 8);
+        wet[1] = new SimplexOctaveGenerator(seed, 8);
         blubb = new SimplexOctaveGenerator(seed, 8);
         if(big)
         {
-            temp.setScale(1.0/7777.0);
-            wet.setScale(1.0/4444.0);
+            temp[0].setScale(1.0/7777.0);
+            temp[1].setScale(1.0/159.0);
+            wet[0].setScale(1.0/4444.0);
+            wet[1].setScale(1.0/111.0);
+            blubb.setScale(1.0/222.0);
         }
         else
         {
-            temp.setScale(1.0/777.0);
-            wet.setScale(1.0/444.0);
+            temp[0].setScale(1.0/777.0);
+            temp[1].setScale(1.0/15.0);
+            wet[0].setScale(1.0/444.0);
+            wet[1].setScale(1.0/11.0);
+            blubb.setScale(1.0/22.0);
         }
-        blubb.setScale(1.0/22.0);
+    }
+    
+    private double getTemp(int x, int z)
+    {
+        return temp[0].noise(x, z, 0.5, 0.5) + (temp[1].noise(x, z, 0.5, 0.5) / 10D);
+    }
+    
+    private double getWet(int x, int z)
+    {
+        return wet[0].noise(x, z, 0.5, 0.5) + (wet[1].noise(x, z, 0.5, 0.5) / 10D);
     }
     
     public Biome get(int x, int y, int z)
     {
         if(y < 64)
         {
-            if(wet.noise(x, z, 0.5, 0.5) > 0.5)
+            if(getWet(x, z) > 0.5)
             {
                 return Biome.SWAMPLAND;
             }
-            return (temp.noise(x, z, 0.5, 0.5) < -0.25) ? Biome.FROZEN_OCEAN : Biome.OCEAN;
+            return (getTemp(x, z) < -0.25) ? Biome.FROZEN_OCEAN : Biome.OCEAN;
         }
         if(y == 64)
         {
             return Biome.BEACH;
         }
-        int id = t(wet.noise(x, z, 0.5, 0.5)) + (4 * t(temp.noise(x, z, 0.5, 0.5))) + ((y > 144) ? 16 : 0);
+        int id = t(getWet(x, z)) + (4 * t(getTemp(x, z))) + ((y > 144) ? 16 : 0);
         switch(id)
         {
             case 0:
@@ -165,6 +184,8 @@ public class BiomeHandler
             case OCEAN:
             case FROZEN_OCEAN: return blubb.noise(x, z, 0.5, 0.5) >= 0 ? 12 : 3; // Sand or dirt
             case SWAMPLAND: return 9; // Water
+            case MUSHROOM_ISLAND:
+            case MUSHROOM_SHORE: return 110; // Mycelium
             default: break;
         }
         return 2; // Grass
