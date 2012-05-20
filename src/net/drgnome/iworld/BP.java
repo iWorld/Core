@@ -6,6 +6,8 @@ package net.drgnome.iworld;
 
 import java.util.Random;
 
+import net.minecraft.server.*;
+
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.block.Biome;
 import org.bukkit.Chunk;
@@ -52,8 +54,49 @@ public abstract class BP extends BlockPopulator
         }
     }
     
-    public void popBlock(World world, Random rand, int x, int z, Biome biome)
+    public abstract void popBlock(World world, Random rand, int x, int z, Biome biome);
+    
+    public static void set(World world, int x, int y, int z, int id)
     {
-        
+        world.getBlockAt(x, y, z).setTypeId(id);
+    }
+    
+    public static void set(World world, int x, int y, int z, int id, boolean update)
+    {
+        world.getBlockAt(x, y, z).setTypeId(id, update);
+    }
+    
+    public static void set(World world, int x, int y, int z, int id, int meta)
+    {
+        set(world, x, y, z, id, meta, false);
+    }
+    
+    public static void set(World world, int x, int y, int z, int id, int meta, boolean update)
+    {
+        world.getBlockAt(x, y, z).setTypeIdAndData(id, (byte)meta, update);
+    }
+    
+    public static int get(World world, int x, int y, int z)
+    {
+        return world.getBlockTypeIdAt(x, y, z);
+    }
+    
+    public static int getMeta(World world, int x, int y, int z)
+    {
+        return (int)world.getBlockAt(x, y, z).getData();
+    }
+    
+    public static int getMaxY(World world, int x, int z)
+    {
+        if(world == null)
+        {
+            return 0;
+        }
+        int y = 255;
+        while(world.getBlockTypeIdAt(x, y, z) == 0)
+        {
+            y--;
+        }
+        return y;
     }
 }

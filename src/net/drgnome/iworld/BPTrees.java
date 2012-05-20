@@ -13,14 +13,14 @@ import org.bukkit.block.Biome;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 
-public class BPTrees extends BPC
+public class BPTrees extends BP
 {
     public BPTrees(String id)
     {
         super(id);
     }
     
-    public void pop(World world, Random rand, int x0, int z0)
+    public void popBlock(World world, Random rand, int x, int z, Biome biome)
     {
         
     }

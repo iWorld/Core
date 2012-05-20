@@ -28,20 +28,7 @@ public class BPSnow extends BP
             case ICE_MOUNTAINS:
             case TAIGA:
             case TAIGA_HILLS:
-                int y = world.getHighestBlockYAt(x, z);
-                while(world.getBlockTypeIdAt(x, y, z) != 0)
-                {
-                    y++;
-                }
-                if(Block.byId[78].canPlace(((CraftWorld)world).getHandle(), x, y, z))
-                {
-                    byte meta = 0;
-                    if(isSet("a"))
-                    {
-                        meta = (byte)rand.nextInt(8);
-                    }
-                    world.getBlockAt(x, y, z).setTypeIdAndData(78, meta, false);
-                }
+                set(world, x, getMaxY(world, x, z) + 1, z, 78, isSet("a") ? (byte)rand.nextInt(8) : 0);
                 break;
             default: break;
         }

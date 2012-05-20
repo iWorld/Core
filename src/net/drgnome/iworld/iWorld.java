@@ -72,6 +72,7 @@ public class iWorld extends ChunkGenerator
     public List<BlockPopulator> getDefaultPopulators(World world)
     {
         ArrayList<BlockPopulator> list = new ArrayList<BlockPopulator>();
+        list.add(new BPOres(genID));
         list.add(new BPPlants(genID));
         list.add(new BPSnow(genID));
         return list;

@@ -23,18 +23,14 @@ public class BPPlants extends BP
     public void popBlock(World world, Random rand, int x, int z, Biome biome)
     {
         int i;
-        int y = world.getHighestBlockYAt(x, z);
-        while(world.getBlockTypeIdAt(x, y, z) != 0)
-        {
-            y++;
-        }
+        int y = getMaxY(world, x, z) + 1;
         switch(biome)
         {
             case DESERT:
             case DESERT_HILLS:
                 if(rand.nextInt(400) == 0)
                 {
-                    world.getBlockAt(x, y, z).setTypeId(32); // Dead bush
+                    set(world, x, y, z, 32); // Dead bush
                 }
                 break;
             case TAIGA:
@@ -44,13 +40,13 @@ public class BPPlants extends BP
                 i = rand.nextInt(225);
                 if(i < 2)
                 {
-                    world.getBlockAt(x, y, z).setTypeId(37 + i); // Flower / Rose
+                    set(world, x, y, z, 37 + i); // Flower / Rose
                 }
                 break;
             case SWAMPLAND:
                 if(rand.nextInt(30) == 0)
                 {
-                    world.getBlockAt(x, y, z).setTypeId(111); // Water lily
+                    set(world, x, y, z, 111); // Water lily
                 }
                 break;
             case MUSHROOM_ISLAND:
@@ -58,7 +54,7 @@ public class BPPlants extends BP
                 i = rand.nextInt(25);
                 if(i < 2)
                 {
-                    world.getBlockAt(x, y, z).setTypeId(39 + i); // Brown or red mushroom
+                    set(world, x, y, z, 39 + i); // Brown or red mushroom
                 }
                 break;
             case PLAINS:
@@ -67,19 +63,19 @@ public class BPPlants extends BP
                 i = rand.nextInt(1000);
                 if(i < 2)
                 {
-                    world.getBlockAt(x, y, z).setTypeId(37); // Flower
+                    set(world, x, y, z, 37); // Flower
                 }
                 else if(i < 4)
                 {
-                    world.getBlockAt(x, y, z).setTypeId(38); // Rose
+                    set(world, x, y, z, 38); // Rose
                 }
                 else if(i < 100)
                 {
-                    world.getBlockAt(x, y, z).setTypeIdAndData(31, (byte)1, true); // Tall grass
+                    set(world, x, y, z, 31, 1, true); // Tall grass
                 }
                 else if(i == 100)
                 {
-                    world.getBlockAt(x, y, z).setTypeIdAndData(31, (byte)2, true); // Fern
+                    set(world, x, y, z, 31, 2, true); // Fern
                 }
                 break;
             case FOREST:
@@ -87,19 +83,19 @@ public class BPPlants extends BP
                 i = rand.nextInt(1000);
                 if(i < 3)
                 {
-                    world.getBlockAt(x, y, z).setTypeId(37); // Flower
+                    set(world, x, y, z, 37); // Flower
                 }
                 else if(i < 6)
                 {
-                    world.getBlockAt(x, y, z).setTypeId(38); // Rose
+                    set(world, x, y, z, 38); // Rose
                 }
                 else if(i < 25)
                 {
-                    world.getBlockAt(x, y, z).setTypeIdAndData(31, (byte)1, true); // Tall grass
+                    set(world, x, y, z, 31, 1, true); // Tall grass
                 }
                 else if(i < 40)
                 {
-                    world.getBlockAt(x, y, z).setTypeIdAndData(31, (byte)2, true); // Fern
+                    set(world, x, y, z, 31, 2, true); // Fern
                 }
                 break;
             case JUNGLE:
@@ -107,19 +103,19 @@ public class BPPlants extends BP
                 i = rand.nextInt(1000);
                 if(i < 5)
                 {
-                    world.getBlockAt(x, y, z).setTypeId(37); // Flower
+                    set(world, x, y, z, 37); // Flower
                 }
                 else if(i < 10)
                 {
-                    world.getBlockAt(x, y, z).setTypeId(38); // Rose
+                    set(world, x, y, z, 38); // Rose
                 }
                 else if(i < 150)
                 {
-                    world.getBlockAt(x, y, z).setTypeIdAndData(31, (byte)1, true); // Tall grass
+                    set(world, x, y, z, 31, 1, true); // Tall grass
                 }
                 else if(i < 200)
                 {
-                    world.getBlockAt(x, y, z).setTypeIdAndData(31, (byte)2, true); // Fern
+                    set(world, x, y, z, 31, 2, true); // Fern
                 }
                 break;
         }
