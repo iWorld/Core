@@ -28,11 +28,7 @@ public abstract class BP extends BlockPopulator
     
     public void populate(World world, Random rand, Chunk chunk)
     {
-        rand.setSeed(world.getSeed());
-        rand.setSeed(rand.nextLong());
-        rand.setSeed(chunk.getX());
-        rand.setSeed(rand.nextLong());
-        rand.setSeed(chunk.getZ());
+        rand.setSeed((long)((int)world.getSeed() ^ (chunk.getX() | chunk.getZ())));
         rand.setSeed(rand.nextLong());
         try
         {

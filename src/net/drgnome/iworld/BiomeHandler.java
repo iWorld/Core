@@ -14,8 +14,9 @@ public class BiomeHandler
     private SimplexOctaveGenerator[] temp;
     private SimplexOctaveGenerator[] wet;
     private SimplexOctaveGenerator blubb;
+    private boolean sea;
     
-    public BiomeHandler(long seed, boolean big)
+    public BiomeHandler(long seed, boolean big, boolean highsealevel)
     {
         temp = new SimplexOctaveGenerator[2];
         temp[0] = new SimplexOctaveGenerator(seed, 8);
@@ -40,6 +41,12 @@ public class BiomeHandler
             wet[1].setScale(1.0/11.0);
             blubb.setScale(1.0/22.0);
         }
+        sea = highsealevel;
+    }
+    
+    private int getSeaLevel()
+    {
+        return sea ? 128 : 64;
     }
     
     private double getTemp(int x, int z)
@@ -54,7 +61,7 @@ public class BiomeHandler
     
     public Biome get(int x, int y, int z)
     {
-        if(y < 64)
+        if(y < getSeaLevel())
         {
             if(getWet(x, z) > 0.5)
             {
@@ -62,11 +69,11 @@ public class BiomeHandler
             }
             return (getTemp(x, z) < -0.25) ? Biome.FROZEN_OCEAN : Biome.OCEAN;
         }
-        if(y == 64)
+        if(y == getSeaLevel())
         {
             return Biome.BEACH;
         }
-        int id = t(getWet(x, z)) + (4 * t(getTemp(x, z))) + ((y > 144) ? 16 : 0);
+        int id = t(getWet(x, z)) + (4 * t(getTemp(x, z))) + ((y > (sea ? 192 : 128)) ? 16 : 0);
         switch(id)
         {
             case 0:
@@ -75,11 +82,11 @@ public class BiomeHandler
             case 2:
             case 4: return Biome.TAIGA;
             
-            case 3:
-            case 7: return Biome.MUSHROOM_ISLAND;
+            case 3: return Biome.MUSHROOM_ISLAND;
                 
             case 5:
-            case 6: return Biome.PLAINS;
+            case 6:
+            case 7: return Biome.PLAINS;
                 
             case 8:
             case 12: return Biome.DESERT;

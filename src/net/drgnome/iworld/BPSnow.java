@@ -24,13 +24,15 @@ public class BPSnow extends BP
     {
         switch(biome)
         {
-            case FROZEN_OCEAN:
-            case ICE_DESERT:
             case ICE_PLAINS:
             case ICE_MOUNTAINS:
             case TAIGA:
             case TAIGA_HILLS:
                 int y = world.getHighestBlockYAt(x, z);
+                while(world.getBlockTypeIdAt(x, y, z) != 0)
+                {
+                    y++;
+                }
                 if(Block.byId[78].canPlace(((CraftWorld)world).getHandle(), x, y, z))
                 {
                     byte meta = 0;

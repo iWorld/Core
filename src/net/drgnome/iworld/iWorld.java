@@ -16,7 +16,6 @@ import org.bukkit.block.*;
 public class iWorld extends ChunkGenerator 
 {
     private String genID;
-    // a: Different snow heights
     private long seed;
     
     public iWorld(World world, String s)
@@ -59,12 +58,21 @@ public class iWorld extends ChunkGenerator
     
     public byte[][] generateBlockSections(World world, Random rand, int x, int z, BiomeGrid biomes)
     {
-        return GeneratorBase.gen(world, x, z, genID, biomes);
+        try
+        {
+            return GeneratorBase.gen(world, x, z, genID, biomes);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return (byte[][])null;
+        }
     }
     
     public List<BlockPopulator> getDefaultPopulators(World world)
     {
         ArrayList<BlockPopulator> list = new ArrayList<BlockPopulator>();
+        list.add(new BPPlants(genID));
         list.add(new BPSnow(genID));
         return list;
     }

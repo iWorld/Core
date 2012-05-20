@@ -17,4 +17,21 @@ public class Util
         }
         return false;
     }
+    
+    public static int max(int... check)
+    {
+        if(check.length == 0)
+        {
+            return 0;
+        }
+        int v = check[0];
+        for(int i = 1; i < check.length; i++)
+        {
+            if(check[i] > v)
+            {
+                v = check[i];
+            }
+        }
+        return v;
+    }
 }
