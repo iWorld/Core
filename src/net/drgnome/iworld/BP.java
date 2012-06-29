@@ -5,13 +5,14 @@
 package net.drgnome.iworld;
 
 import java.util.Random;
+import java.util.logging.Logger;
 
 import net.minecraft.server.*;
 
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.block.Biome;
 import org.bukkit.Chunk;
-import org.bukkit.World;
+// import org.bukkit.World;
 import org.bukkit.generator.*;
 
 public abstract class BP extends BlockPopulator
@@ -28,28 +29,42 @@ public abstract class BP extends BlockPopulator
         return genID.contains(ch);
     }
     
-    public void populate(World world, Random rand, Chunk chunk)
+    public void populate(org.bukkit.World world, Random rand, Chunk chunk)
     {
-        rand.setSeed((long)((int)world.getSeed() ^ (chunk.getX() | chunk.getZ())));
-        rand.setSeed(rand.nextLong());
-        try
+        if(world instanceof CraftWorld)
         {
-            pop(world, rand, chunk.getX() * 16, chunk.getZ() * 16);
+            World worldObj = ((CraftWorld)world).getHandle();
+            rand.setSeed(worldObj.getSeed());
+            long l = (rand.nextLong() / 2L) * 2L + 1L;
+            long l1 = (rand.nextLong() / 2L) * 2L + 1L;
+            rand.setSeed((long)chunk.getX() * l + (long)chunk.getZ() * l1 ^ worldObj.getSeed());
+            try
+            {
+                pop(world, worldObj, rand, chunk.getX() * 16, chunk.getZ() * 16);
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
         }
-        catch(Exception e)
+        else
         {
-            e.printStackTrace();
+            Logger.getLogger("Minecraft").severe("[iWorld] World not an instance of CraftWorld!");
+            Logger.getLogger("Minecraft").severe("[iWorld] Instance of: " + world.getClass().getName());
+            return;
         }
+        /*rand.setSeed((long)((int)world.getSeed() ^ (chunk.getX() | chunk.getZ())));
+        rand.setSeed(rand.nextLong());*/
     }
     
-    public void pop(World world, Random rand, int x0, int z0)
+    public void pop(org.bukkit.World world, World worldObj, Random rand, int x0, int z0)
     {
         int x, z;
         for(x = x0; x < x0 + 16; x++)
         {
             for(z = z0; z < z0 + 16; z++)
             {
-                popBlock(world, rand, x, z, world.getBiome(x, z));
+                popBlock(worldObj, rand, x, z, world.getBiome(x, z));
             }
         }
     }
@@ -58,32 +73,22 @@ public abstract class BP extends BlockPopulator
     
     public static void set(World world, int x, int y, int z, int id)
     {
-        world.getBlockAt(x, y, z).setTypeId(id);
-    }
-    
-    public static void set(World world, int x, int y, int z, int id, boolean update)
-    {
-        world.getBlockAt(x, y, z).setTypeId(id, update);
+        world.setTypeId(x, y, z, id);
     }
     
     public static void set(World world, int x, int y, int z, int id, int meta)
     {
-        set(world, x, y, z, id, meta, false);
-    }
-    
-    public static void set(World world, int x, int y, int z, int id, int meta, boolean update)
-    {
-        world.getBlockAt(x, y, z).setTypeIdAndData(id, (byte)meta, update);
+        world.setTypeIdAndData(x, y, z, id, meta);
     }
     
     public static int get(World world, int x, int y, int z)
     {
-        return world.getBlockTypeIdAt(x, y, z);
+        return world.getTypeId(x, y, z);
     }
     
     public static int getMeta(World world, int x, int y, int z)
     {
-        return (int)world.getBlockAt(x, y, z).getData();
+        return world.getData(x, y, z);
     }
     
     public static int getMaxY(World world, int x, int z)
@@ -93,7 +98,7 @@ public abstract class BP extends BlockPopulator
             return 0;
         }
         int y = 255;
-        while(world.getBlockTypeIdAt(x, y, z) == 0)
+        while(world.getTypeId(x, y, z) == 0)
         {
             y--;
         }

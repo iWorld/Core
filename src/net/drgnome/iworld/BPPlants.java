@@ -8,10 +8,7 @@ import java.util.Random;
 
 import net.minecraft.server.*;
 
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.block.Biome;
-import org.bukkit.Chunk;
-import org.bukkit.World;
 
 public class BPPlants extends BP
 {
@@ -71,11 +68,11 @@ public class BPPlants extends BP
                 }
                 else if(i < 100)
                 {
-                    set(world, x, y, z, 31, 1, true); // Tall grass
+                    set(world, x, y, z, 31, 1); // Tall grass
                 }
                 else if(i == 100)
                 {
-                    set(world, x, y, z, 31, 2, true); // Fern
+                    set(world, x, y, z, 31, 2); // Fern
                 }
                 break;
             case FOREST:
@@ -91,11 +88,11 @@ public class BPPlants extends BP
                 }
                 else if(i < 25)
                 {
-                    set(world, x, y, z, 31, 1, true); // Tall grass
+                    set(world, x, y, z, 31, 1); // Tall grass
                 }
                 else if(i < 40)
                 {
-                    set(world, x, y, z, 31, 2, true); // Fern
+                    set(world, x, y, z, 31, 2); // Fern
                 }
                 break;
             case JUNGLE:
@@ -111,11 +108,11 @@ public class BPPlants extends BP
                 }
                 else if(i < 150)
                 {
-                    set(world, x, y, z, 31, 1, true); // Tall grass
+                    set(world, x, y, z, 31, 1); // Tall grass
                 }
                 else if(i < 200)
                 {
-                    set(world, x, y, z, 31, 2, true); // Fern
+                    set(world, x, y, z, 31, 2); // Fern
                 }
                 break;
         }

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.drgnome.iworld</groupId>
 	<artifactId>iWorld</artifactId>
-	<version>0.2</version>
+	<version>0.3</version>
 	<name>iWorld-Core</name>
 	<description>Custom WGen with special features.</description>
 	<url>http://dev.bukkit.org/server-mods/iworld/</url>
@@ -22,7 +22,7 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>1.2.5-R2.0</version>
+			<version>1.2.5-R4.0</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>

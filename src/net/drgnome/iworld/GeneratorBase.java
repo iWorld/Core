@@ -172,7 +172,7 @@ public class GeneratorBase
             {
                 for(y = 255; y >= 0; y--)
                 {
-                    if((field[x][z][y] == 4) && ((y == 255) || (field[x][z][y + 1] == 0) || (field[x][z][y + 1] == 42)))
+                    if((field[x][z][y] == 4) && ((y == 255) || (field[x][z][y + 1] == 0) || (field[x][z][y + 1] == 1)))
                     {
                         field[x][z][y] = 5;
                     }
@@ -200,8 +200,25 @@ public class GeneratorBase
                     s = 0;
                     switch(field[x][z][y])
                     {
+                        case 0:
+                            if(y < getSeaLevel())
+                            {
+                                s = 9;
+                            }
+                            else if(y == getSeaLevel())
+                            {
+                                if(cover)
+                                {
+                                    s = 9;
+                                }
+                                else
+                                {
+                                    s = types[3];
+                                }
+                            }
+                            break;
                         case 1:
-                            s = 7; // Bedrock
+                            s = 0; // Unoverridable air
                             break;
                         case 2:
                             s = 1; // Stone
@@ -215,39 +232,22 @@ public class GeneratorBase
                         case 5:
                             s = types[2];
                             break;
-                        case 42:
-                            s = -1; // Unoverridable air
+                        case 7:
+                            s = 7; // Bedrock stays bedrock
                             break;
                     }
-                    if(s == 0)
+                    if(y == 0)
                     {
-                        if(y < getSeaLevel())
-                        {
-                            s = 9;
-                        }
-                        else if(y == getSeaLevel())
-                        {
-                            if(cover)
-                            {
-                                s = 9;
-                            }
-                            else
-                            {
-                                s = types[3];
-                            }
-                        }
+                        // You shall not pass!
+                        s = 7;
                     }
-                    if((s == 2) && (y <= getSeaLevel()))
+                    else if((s == 2) && (y < getSeaLevel()))
                     {
                         s = 3;
                     }
                     if((!cover) && (s != 0))
                     {
                         cover = true;
-                    }
-                    if(s == -1)
-                    {
-                        s = 0;
                     }
                     set(x, y, z, s);
                 }
@@ -278,11 +278,11 @@ public class GeneratorBase
                     {
                         if((x % 4 == 0) || (y % 4 == 0) || (z % 4 == 0))
                         {
-                            field[x][z][y] = 1;
+                            field[x][z][y] = 7;
                         }
                         else
                         {
-                            field[x][z][y] = 42;
+                            field[x][z][y] = 7;
                         }
                     }
                 }
@@ -293,17 +293,17 @@ public class GeneratorBase
                 {
                     if(rand.nextInt(2) == 0)
                     {
-                        field[x * 4][(z * 4) + 2][1] = 42;
-                        field[x * 4][(z * 4) + 2][2] = 42;
+                        field[x * 4][(z * 4) + 2][1] = 7;
+                        field[x * 4][(z * 4) + 2][2] = 7;
                     }
                     if(rand.nextInt(2) == 0)
                     {
-                        field[(x * 4) + 2][z * 4][1] = 42;
-                        field[(x * 4) + 2][z * 4][2] = 42;
+                        field[(x * 4) + 2][z * 4][1] = 7;
+                        field[(x * 4) + 2][z * 4][2] = 7;
                     }
                     if(rand.nextInt(2) == 0)
                     {
-                        field[(x * 4) + 2][(z * 4) + 2][4] = 42;
+                        field[(x * 4) + 2][(z * 4) + 2][4] = 7;
                     }
                 }
             }
@@ -312,7 +312,41 @@ public class GeneratorBase
     
     private void modifyBlock(int chunkX, int chunkZ, int x, int z, byte[][][] field)
     {
-        int y;
+        int y, y0, y1;
+        // Grass, dirt, ...
+        for(y = 255; y > 11; y--)
+        {
+            if((field[x][z][y] == 0) && (field[x][z][y - 1] != 0))
+            {
+                y0 = (int)Math.round((gen[2].noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5, 0.5) * (-2)) + 3);
+                if(y0 < 1)
+                {
+                    y0 = 1;
+                }
+                if(y0 > 5)
+                {
+                    y0 = 5;
+                }
+                if(field[x][z][y - 1] == 2)
+                {
+                    field[x][z][y - 1] = 5;
+                }
+                for(y1 = y - 2; y1 >= y - (y0 + 1); y1--)
+                {
+                    if(field[x][z][y1] == 2)
+                    {
+                        field[x][z][y1] = 4;
+                    }
+                }
+                for(y1 = y - (y0 + 1); y1 >= y - ((2 * y0) + 1); y1--)
+                {
+                    if(field[x][z][y1] == 2)
+                    {
+                        field[x][z][y1] = 3;
+                    }
+                }
+            }
+        }
         // Water caves
         if(!isSet("b"))
         {
@@ -329,7 +363,7 @@ public class GeneratorBase
                 max += (int)Math.round(gen[8].noise((chunkX * 16) + x, (chunkZ * 16) + z, 0.5, 0.5) * (-7D));
                 if(y >= getSeaLevel())
                 {
-                    while((max >= y - 3) && (max >= getSeaLevel() + (isSet("7") ? 8 : 4)))
+                    while((max >= y - 3) && (max >= getSeaLevel() + 3))
                     {
                         max--;
                     }
@@ -350,24 +384,60 @@ public class GeneratorBase
     private byte[][][] generateField(int chunkX, int chunkZ)
     {
         int radius = getSmoothRad();
-        
-        byte[][][][] fields = new byte[9][16][16][256];
-        
+        byte[][][][] fields = new byte[9][][][];
         fields[0] = genField(chunkX - 1, chunkZ - 1, 16 - radius, 16, 16 - radius, 16);
         fields[1] = genField(chunkX - 1, chunkZ, 16 - radius, 16, 0, 16);
         fields[2] = genField(chunkX - 1, chunkZ + 1, 16 - radius, 16, 0, radius);
-        
         fields[3] = genField(chunkX, chunkZ - 1, 0, 16, 16 - radius, 16);
         fields[4] = genField(chunkX, chunkZ);
         fields[5] = genField(chunkX, chunkZ + 1, 0, 16, 0, radius);
-        
         fields[6] = genField(chunkX + 1, chunkZ - 1, 0, radius, 16 - radius, 16);
         fields[7] = genField(chunkX + 1, chunkZ, 0, radius, 0, 16);
         fields[8] = genField(chunkX + 1, chunkZ + 1, 0, radius, 0, radius);
-        
-        byte[][][] bigfield = new byte[48][48][256];
-        int a, b, x, y, z;
-        for(a = 0; a < 3; a++)
+        byte[][][] bigfield = new byte[16 + (2 * radius)][16 + (2 * radius)][256];
+        int id, a, b, x, y, z;
+        for(x = 0; x < bigfield.length; x++)
+        {
+            for(z = 0; z < bigfield[x].length; z++)
+            {
+                id = (x < radius ? 0 : (x < radius + 16 ? 1 : 2)) + (z < radius ? 0 : (z < radius + 16 ? 3 : 6));
+                a = x < radius ? 0 : (x < radius + 16 ? radius : (radius + 16));
+                b = z < radius ? 0 : (z < radius + 16 ? radius : (radius + 16));
+                for(y = 0; y < 256; y++)
+                {
+                    bigfield[x][z][y] = fields[id][x - a][z - b][y];
+                }
+            }
+        }
+        boolean[][][][] snap = new boolean[(2 * radius) + 16][(2 * radius) + 16][(2 * radius) + 1][(2 * radius) + 1];
+        for(a = 0; a < snap.length; a++)
+        {
+            for(b = 0; b < snap[a].length; b++)
+            {
+                for(id = 255; id >= 0; id--)
+                {
+                    if(bigfield[a][b][id] != 0)
+                    {
+                        break;
+                    }
+                }
+                for(x = 0; x < snap[a][b].length; x++)
+                {
+                    for(z = 0; z < snap[a][b][x].length; z++)
+                    {
+                        if(((x == radius) && (z == radius)) || (a + x - radius < 0) ||Ê(a + x - radius > ))
+                        {
+                            continue;
+                        }
+                        for(y = 255; y >= 0; y--)
+                        {
+                            if(bigfield[][][][])
+                        }
+                    }
+                }
+            }
+        }
+        /*for(a = 0; a < 3; a++)
         {
             for(b = 0; b < 3; b++)
             {
@@ -382,18 +452,15 @@ public class GeneratorBase
                     }
                 }
             }
-        }
-        
+        }*/
         // Amount of blocks
         double n = Math.pow(((double)radius * 2D) + 1D, 2D) - 1D;
         double height, factor;
-        int id;
         byte[][][] field = new byte[16][16][256];
         for(x = 0; x < 16; x++)
         {
             for(z = 0; z < 16; z++)
             {
-                height = getHeight(x, z, radius, bigfield) / n;
                 for(y = 255; y >= 0; y--)
                 {
                     if(getBlockFromCoords(fields[4], x, y, z) != 0)
@@ -401,18 +468,33 @@ public class GeneratorBase
                         break;
                     }
                 }
+                height = getHeight(x, z, radius, y, n, bigfield, snap);
                 factor = (double)y + ((height - (double)y) * (n - 1D) / n);
                 factor /= (double)y;
-                for(y = 255; y >= 0; y--)
+                y = (int)Math.round((double)y * factor);
+                if(y > 255)
                 {
-                    field[x][z][y] = (byte)getBlockFromCoords(fields[4], x, (int)Math.round((double)y / factor), z);
+                    y = 255;
+                }
+                if(y < 0)
+                {
+                    y = 0;
+                }
+                for(; y >= 0; y--)
+                {
+                    id = getBlockFromCoords(fields[4], x, (int)Math.round((double)y / factor), z);
+                    if((id == 0) || (id == 1))
+                    {
+                        factor = 1D;
+                    }
+                    field[x][z][y] = (byte)id;
                 }
             }
         }
         return field;
     }
     
-    private double getHeight(int x1, int z1, int rad, byte[][][] field)
+    private double getHeight(int x1, int z1, int rad, int mid, double amount, byte[][][] field, boolean[][][][] snap)
     {
         double height = 0.0D;
         try
@@ -430,13 +512,33 @@ public class GeneratorBase
                     {
                         continue;
                     }
-                    for(y = 255; y >= 0; y--)
+                    if((getBlockFromCoords(field, x, mid, z) != 0) && (getBlockFromCoords(field, x, mid, z) != 1))
                     {
-                        if(getBlockFromCoords(field, x, y, z) != 0)
+                        for(y = mid; y < 256; y++)
                         {
-                            height += (double)y;
-                            break;
+                            if((getBlockFromCoords(field, x, y + 1, z) == 0) && (getBlockFromCoords(field, x, y + 1, z) != 1))
+                            {
+                                break;
+                            }
                         }
+                    }
+                    else
+                    {
+                        for(y = mid; y >= 0; y--)
+                        {
+                            if((getBlockFromCoords(field, x, y, z) != 0) && (getBlockFromCoords(field, x, y, z) != 1))
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    if(Math.abs(mid - y) <= 16)
+                    {
+                        height += (double)y;
+                    }
+                    else
+                    {
+                        amount--;
                     }
                 }
             }
@@ -445,7 +547,7 @@ public class GeneratorBase
         {
             e.printStackTrace();
         }
-        return height;
+        return amount == 0D ? 0D : height/amount;
     }
     
     private byte[][][] genField(int chunkX, int chunkZ)
@@ -456,87 +558,67 @@ public class GeneratorBase
     private byte[][][] genField(int chunkX, int chunkZ, int x1, int x2, int z1, int z2)
     {
         int x, y, z;
-        byte[][][] field = new byte[16][16][256];
+        byte[][][] field = new byte[x2 - x1][z2 - z1][256];
         // 0: Air
-        // 1: Bedrock
+        // 1: Hard air
         // 2: Stone
         // 3: Biome block
         // 4: Second biome block
-        int[] levels = new int[4];
-        int[] tmp = new int[5];
-        double factor;
-        for(x = x1; x < x2; x++)
+        // 5: Cover block
+        int[] levels = new int[2];
+        int[] tmp = new int[3];
+        for(x = 0; x < (x2 - x1); x++)
         {
-            for(z = z1; z < z2; z++)
+            for(z = 0; z < (z2 - z1); z++)
             {
                 // Getting heights
-                tmp[0] = (int)Math.round(gen[0].noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5, 0.5) * (-60)) + 65;
-                tmp[1] = (int)Math.round(gen[1].noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5, 0.5) * (-60)) + 70;
-                levels[1] = max(tmp[0], tmp[1], 10);
-                levels[0] = (int)Math.round(((double)levels[1] / 2.0) + (gen[2].noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5, 0.5) * ((double)levels[1] / (-3.0))));
-                for(y = 1; y < levels[0]; y++)
+                levels[0] = (int)Math.round(gen[0].noise(chunkX * 16 + x1 + x, chunkZ * 16 + z1 + z, 0.5, 0.5) * (-60)) + 65;
+                tmp[0] = (int)Math.round(gen[1].noise(chunkX * 16 + x1 + x, chunkZ * 16 + z1 + z, 0.5, 0.5) * (-60)) + 70;
+                levels[0] = max(levels[0], tmp[0], 10);
+                levels[1] = (int)Math.round((Math.round(gen[3].noise(chunkX * 16 + x1 + x, chunkZ * 16 + z1 + z, 0.5, 0.5) * (-70)) + 180) * (isSet("3") ? 1D : (isSet("2") ? 0.3D : ((gen[6].noise(chunkX * 16 + x1 + x, chunkZ * 16 + z1 + z, 0.5, 0.5) / 2.2) + 0.5))));
+                if(levels[1] > 255)
                 {
-                    set(field, x, y, z, 2);
+                    levels[1] = 255;
                 }
-                levels[2] = (int)Math.round(gen[3].noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5, 0.5) * (-110)) + 120;
-                factor = isSet("3") ? 1D : (isSet("2") ? 0.3D : (gen[6].noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5, 0.5) / 3.0) + 0.5);
-                levels[2] = (int)Math.round((double)levels[2] * factor);
-                if(levels[2] > 255)
-                {
-                    levels[2] = 255;
-                }
+                levels[1] = max(levels[0], levels[1]);
                 if(isSet("1"))
                 {
-                    tmp[1] = levels[2] > levels[1] ? levels[2] : levels[1];
                     if(isSet("0"))
                     {
-                        tmp[1] += (int)Math.round(gen[5].noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5, 0.5) * (-5));
+                        levels[1] += (int)Math.round(gen[5].noise(chunkX * 16 + x1 + x, chunkZ * 16 + z1 + z, 0.5, 0.5) * (-5));
                     }
-                    tmp[0] = (int)Math.floor((double)tmp[1] * 0.9D);
-                    for(y = levels[0]; y < tmp[0]; y++)
+                    for(y = 1; y <= levels[1]; y++)
                     {
-                        set(field, x, y, z, 3);
-                    }
-                    for(y = tmp[0]; y <= tmp[1]; y++)
-                    {
-                        set(field, x, y, z, 4);
+                        set(field, x, y, z, 2);
                     }
                 }
                 else
                 {
-                    tmp[0] = levels[0];
-                    tmp[1] = y = levels[1];
-                    levels[2] = levels[2] > levels[1] ? levels[2] : levels[1];
-                    while(y <= levels[2])
+                    tmp[0] = y = 1;
+                    tmp[1] = levels[0];
+                    while(y <= levels[1])
                     {
-                        while((gen[4].noise(chunkX * 16 + x, tmp[1] + 1, chunkZ * 16 + z, 0.5, 0.5) >= 0D) && (tmp[1] < levels[2]))
+                        while((gen[4].noise(chunkX * 16 + x1 + x, tmp[1] + 1, chunkZ * 16 + z1 + z, 0.5, 0.5) >= 0D) && (tmp[1] < levels[1]))
                         {
                             tmp[1]++;
                         }
-                        tmp[4] = tmp[1];
+                        tmp[2] = tmp[1];
                         if(isSet("0"))
                         {
-                            tmp[1] += (int)Math.round(gen[5].noise(chunkX * 16 + x, chunkZ * 16 + z, 0.5, 0.5) * (-5));
+                            tmp[1] += (int)Math.round(gen[5].noise(chunkX * 16 + x1 + x, chunkZ * 16 + z1 + z, 0.5, 0.5) * (-5));
                         }
-                        tmp[2] = (int)Math.floor((double)tmp[1] * 0.8D);
-                        for(tmp[3] = tmp[0]; tmp[3] < tmp[2]; tmp[3]++)
+                        for(; tmp[0] <= tmp[1]; tmp[0]++)
                         {
-                            set(field, x, tmp[3], z, 3);
+                            set(field, x, tmp[0], z, 2);
                         }
-                        for(tmp[3] = tmp[2]; tmp[3] <= tmp[1]; tmp[3]++)
-                        {
-                            set(field, x, tmp[3], z, 4);
-                        }
-                        tmp[1] = tmp[4] + 1;
-                        while((gen[3].noise(chunkX * 16 + x, tmp[1], chunkZ * 16 + z, 0.5, 0.5) < 0D) && (tmp[1] <= levels[2]))
+                        tmp[1] = tmp[2] + 1;
+                        while((gen[3].noise(chunkX * 16 + x1 + x, tmp[1], chunkZ * 16 + z1 + z, 0.5, 0.5) < 0D) && (tmp[1] <= levels[1]))
                         {
                             tmp[1]++;
                         }
                         y = tmp[0] = tmp[1];
                     }
                 }
-                // You shall not pass
-                field[x][z][0] = 1;
             }
         }
         return field;
